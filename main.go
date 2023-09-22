@@ -3,8 +3,8 @@ package main
 import (
 	"time"
 
-	ctrl "github.com/gin-api/src"
-	handler "github.com/gin-api/util"
+	"github.com/gin-api/controler"
+	"github.com/gin-api/handler"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,17 +24,17 @@ func setupRouter() *gin.Engine {
 	time.Local = location
 
 	login := r.Group("/api")
-	login.POST("/login", ctrl.Login)
+	login.POST("/login", controler.Login)
 
 	authorized := r.Group("/api/product")
 
 	authorized.Use(handler.AuthMiddleware())
-	authorized.POST("addProduct", ctrl.AddProduct)
-	authorized.GET("getProductAll", ctrl.GetProductAll)
-	authorized.GET("getProductById/:id", ctrl.GetProductById)
-	authorized.PUT("updateProduct/:id", ctrl.UpdateProduct)
-	authorized.PUT("updateStock/:id", ctrl.UpdateStock)
-	authorized.DELETE("deleteProduct/:id", ctrl.DeleteStock)
+	authorized.POST("addProduct", controler.AddProduct)
+	authorized.GET("getProductAll", controler.GetProductAll)
+	authorized.GET("getProductById/:id", controler.GetProductById)
+	authorized.PUT("updateProduct/:id", controler.UpdateProduct)
+	authorized.PUT("updateStock/:id", controler.UpdateStock)
+	authorized.DELETE("deleteProduct/:id", controler.DeleteStock)
 	return r
 }
 

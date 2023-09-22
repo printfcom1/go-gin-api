@@ -1,4 +1,4 @@
-package strc
+package struc
 
 import (
 	"time"

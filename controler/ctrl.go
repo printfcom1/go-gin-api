@@ -1,4 +1,4 @@
-package ctrl
+package controler
 
 import (
 	"context"
@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	mongc "github.com/gin-api/db"
-	strc "github.com/gin-api/struc"
-	handler "github.com/gin-api/util"
+	"github.com/gin-api/db"
+	"github.com/gin-api/handler"
+	"github.com/gin-api/struc"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,11 +16,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var db *mongo.Collection = mongc.InitMongoClient().Database("golang").Collection("product")
+var dataBase *mongo.Collection = db.InitMongoClient().Database("golang").Collection("product")
 
 func Login(c *gin.Context) {
 
-	auth := new(strc.AuthInput)
+	auth := new(struc.AuthInput)
 
 	if err := c.Bind(auth); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
@@ -46,14 +46,14 @@ func Login(c *gin.Context) {
 }
 
 func AddProduct(c *gin.Context) {
-	product := new(strc.Product)
+	product := new(struc.Product)
 
 	if err := c.Bind(product); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	} else {
 		product.CreatedAt = time.Now()
 		product.UpdatedAt = time.Now()
-		res, err := db.InsertOne(context.Background(), product)
+		res, err := dataBase.InsertOne(context.Background(), product)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		} else {
@@ -79,13 +79,13 @@ func GetProductAll(c *gin.Context) {
 
 	go handler.HandlerQuery(c, &filter)
 
-	cursor, err := db.Find(context.Background(), filter, findOptions)
+	cursor, err := dataBase.Find(context.Background(), filter, findOptions)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	} else {
-		var productList []strc.Product
+		var productList []struc.Product
 		for cursor.Next(context.Background()) {
-			var product strc.Product
+			var product struc.Product
 			if err := cursor.Decode(&product); err != nil {
 				c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 				break
@@ -110,8 +110,8 @@ func GetProductById(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	} else {
 		filter := gin.H{"_id": objectID}
-		var result strc.Product
-		err = db.FindOne(context.Background(), filter).Decode(&result)
+		var result struc.Product
+		err = dataBase.FindOne(context.Background(), filter).Decode(&result)
 		HandlerResponse(c, err, result, id)
 	}
 
@@ -124,16 +124,16 @@ func UpdateProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	} else {
 		filter := gin.H{"_id": objectID}
-		productUpdate := new(strc.ProductUpdate)
+		productUpdate := new(struc.ProductUpdate)
 
 		if err := c.Bind(productUpdate); err != nil {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		} else {
 			productUpdate.UpdatedAt = time.Now()
 			update := gin.H{"$set": productUpdate}
-			var result strc.Product
+			var result struc.Product
 			opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
-			err := db.FindOneAndUpdate(context.Background(), filter, update, opts).Decode(&result)
+			err := dataBase.FindOneAndUpdate(context.Background(), filter, update, opts).Decode(&result)
 			HandlerResponse(c, err, result, id)
 		}
 	}
@@ -147,15 +147,15 @@ func UpdateStock(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	} else {
 		filter := gin.H{"_id": objectID}
-		stockProduct := new(strc.Stock)
+		stockProduct := new(struc.Stock)
 
 		if err := c.Bind(stockProduct); err != nil {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		} else {
 			update := gin.H{"$set": gin.H{"stock": stockProduct}}
-			var result strc.Product
+			var result struc.Product
 			opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
-			err := db.FindOneAndUpdate(context.Background(), filter, update, opts).Decode(&result)
+			err := dataBase.FindOneAndUpdate(context.Background(), filter, update, opts).Decode(&result)
 			HandlerResponse(c, err, result, id)
 		}
 	}
@@ -169,8 +169,8 @@ func DeleteStock(c *gin.Context) {
 		return
 	} else {
 		filter := gin.H{"_id": objectID}
-		var result strc.Product
-		err = db.FindOneAndDelete(context.Background(), filter).Decode(&result)
+		var result struc.Product
+		err = dataBase.FindOneAndDelete(context.Background(), filter).Decode(&result)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 			return
@@ -181,7 +181,7 @@ func DeleteStock(c *gin.Context) {
 
 }
 
-func HandlerResponse(c *gin.Context, err error, result strc.Product, id string) {
+func HandlerResponse(c *gin.Context, err error, result struc.Product, id string) {
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			response := map[string]interface{}{"message": "ToDo item with ID " + id + " not found."}

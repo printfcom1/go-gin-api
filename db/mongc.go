@@ -1,4 +1,4 @@
-package mongc
+package db
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	handler "github.com/gin-api/util"
+	"github.com/gin-api/handler"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	strc "github.com/gin-api/struc"
+	"github.com/gin-api/struc"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/joho/godotenv"
@@ -29,7 +29,7 @@ func HandlerQuery(c *gin.Context, filter *gin.H) {
 	category := c.Query("category")
 	productCode := c.Query("productCode")
 
-	queryKey := []strc.QueryNameCategoryCode{
+	queryKey := []struc.QueryNameCategoryCode{
 		{Field: "name", Key: name},
 		{Field: "category", Key: category},
 		{Field: "productCode", Key: productCode},
@@ -49,7 +49,7 @@ func HandlerQuery(c *gin.Context, filter *gin.H) {
 	soldMin := c.Query("soldMin")
 	soldMax := c.Query("soldMax")
 
-	queryStock := []strc.QueryStock{
+	queryStock := []struc.QueryStock{
 		{Field: "price", Min: priceMin, Max: priceMax},
 		{Field: "stock.available", Min: availableMin, Max: availableMax},
 		{Field: "stock.reserved", Min: reservedMin, Max: reservedMax},
@@ -59,7 +59,7 @@ func HandlerQuery(c *gin.Context, filter *gin.H) {
 	QueryStock(filter, queryStock)
 }
 
-func QueryStock(filter *gin.H, query []strc.QueryStock) {
+func QueryStock(filter *gin.H, query []struc.QueryStock) {
 	for _, item := range query {
 		if item.Min != "" {
 			parsedVariableMin, _ := strconv.Atoi(item.Min)
@@ -77,7 +77,7 @@ func QueryStock(filter *gin.H, query []strc.QueryStock) {
 	}
 }
 
-func QueryNameCategoryCode(filter *gin.H, query []strc.QueryNameCategoryCode) {
+func QueryNameCategoryCode(filter *gin.H, query []struc.QueryNameCategoryCode) {
 	for _, item := range query {
 		if item.Key != "" {
 			regexPattern := "(?i)^" + regexp.QuoteMeta(item.Key)
