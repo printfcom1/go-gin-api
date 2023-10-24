@@ -46,12 +46,13 @@ func setupRouter() *gin.Engine {
 	authorized := r.Group("/api/product")
 
 	authorized.Use(authMiddleware())
-	authorized.POST("addProduct", productHandler.CreatedProduct)
-	authorized.GET("getProductAll", productHandler.GetProducts)
-	authorized.GET("getProductById/:id", productHandler.GetProductById)
-	authorized.PUT("updateProduct/:id", productHandler.UpdateProduct)
-	authorized.PUT("updateStock/:id", productHandler.UpdateStockProduct)
-	authorized.DELETE("deleteProduct/:id", productHandler.DeleteProduct)
+	authorized.POST("Product", productHandler.CreatedProduct)
+	authorized.GET("Product", productHandler.GetProducts)
+	authorized.GET("Product/:id", productHandler.GetProductById)
+	authorized.PUT("Product/:id", productHandler.UpdateProduct)
+	authorized.DELETE("Product/:id", productHandler.DeleteProduct)
+
+	authorized.PUT("Stock/:id", productHandler.UpdateStockProduct)
 	return r
 }
 
